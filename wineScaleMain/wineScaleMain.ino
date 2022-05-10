@@ -44,6 +44,8 @@ void startup() {
 void tareGlass() {
   float reading = 0;
   float average = 0;
+  float point1 = 0;
+  float point2 = 0;
 
   scale.tare();
   
@@ -57,9 +59,37 @@ void tareGlass() {
     reading = scale.get_units();
   }
 
-  delay(500);
-  scale.tare();
-  measureWine(); 
+  delay(750);
+  point1 = scale.get_units();
+  delay(250);
+  point2 = scale.get_units();
+  if(point1 >= threshold && point2 >= threshold){
+    if(abs(point1 - point2) <= threshold){
+      scale.tare();
+      measureWine();
+    }
+    else{
+        lcd.clear();
+        lcd.setCursor(2,0);
+        lcd.print("REMOVE GLASS");
+        while(reading >= threshold){
+          reading = scale.get_units();
+        }
+        tareGlass();
+    }
+  }
+  else if(point1 <= threshold && point2 >= threshold){
+    lcd.clear();
+    lcd.setCursor(2,0);
+    lcd.print("REMOVE GLASS");
+    while(reading >= threshold){
+      reading = scale.get_units();
+    }
+    tareGlass();
+  }
+ else{
+   tareGlass();
+ }
 }
 
 void measureWine() {
